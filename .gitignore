@@ -1,0 +1,38 @@
+# Maven / Spring Boot
+**/target/
+**/build/
+.mvn/wrapper/maven-wrapper.jar
+
+# Java artifacts and runtime output
+*.class
+*.log
+hs_err_pid*
+replay_pid*
+
+# IDE files
+.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+.factorypath
+.apt_generated/
+.springBeans
+.sts4-cache/
+.nb-gradle/
+/nbproject/private/
+
+# Editor settings
+.vscode/
+
+# Local environment and OS files
+.env
+.env.*
+!.env.example
+.DS_Store
+Thumbs.db
+
+# Spring Initializr help file
+/project2/HELP.md
