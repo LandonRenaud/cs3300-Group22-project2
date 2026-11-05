@@ -34,7 +34,7 @@ jobs:
 
       - name: Build and test with Maven
         working-directory: project2
-        run: ./mvnw --batch-mode --no-transfer-progress verify
+        run: bash ./mvnw --batch-mode --no-transfer-progress verify
 
   deploy:
     name: Deploy to Google App Engine
