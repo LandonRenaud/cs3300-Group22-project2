@@ -97,3 +97,13 @@ td.controls { display: flex; gap: 6px; justify-content: flex-end; }
 
 .muted { color: var(--muted); }
 .error { color: var(--danger); }
+
+.spaced { margin: 12px 0; }
+.meal-line { display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 8px; margin-bottom: 8px; align-items: center; }
+.meal-card h3 { margin: 0 0 4px; font-size: 1.05rem; }
+.meal-card ul { margin: 8px 0; padding-left: 20px; }
+.meal-card .header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; }
+.have { color: var(--accent); }
+.need { color: var(--danger); }
+.meal-card .controls { display: flex; gap: 6px; }
+.meal-line input { min-width: 0; }

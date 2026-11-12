@@ -11,6 +11,7 @@
     <h1>Meal Prep Planner</h1>
     <nav>
         <a href="#ingredients">Ingredients</a>
+        <a href="#meals">Meals</a>
     </nav>
 </header>
 
@@ -55,9 +56,36 @@
             <p id="nutrition-total" class="muted"></p>
         </div>
     </section>
+
+    <section id="meals">
+        <h2>Saved Meals</h2>
+
+        <form id="meal-form" class="card">
+            <input type="hidden" name="id">
+            <div class="row">
+                <label>Meal name <input name="name" required maxlength="100" placeholder="e.g. Fried Rice"></label>
+            </div>
+            <label class="spaced">Notes <textarea name="notes" rows="2" maxlength="2000" placeholder="Optional tips or steps"></textarea></label>
+            <fieldset>
+                <legend>Ingredients</legend>
+                <div id="meal-lines"></div>
+                <button type="button" id="meal-add-line" class="small secondary">+ Add ingredient</button>
+            </fieldset>
+            <div class="actions">
+                <button type="submit" id="meal-submit">Save meal</button>
+                <button type="button" id="meal-cancel" class="secondary" hidden>Cancel edit</button>
+                <span id="meal-error" class="error" role="alert"></span>
+            </div>
+        </form>
+
+        <label class="spaced">Search meals <input id="meal-search" type="search" placeholder="Meal or ingredient name"></label>
+        <div id="meal-list"></div>
+        <p id="meal-empty" class="muted">No saved meals yet.</p>
+    </section>
 </main>
 
 <script src="api.js"></script>
 <script src="ingredients.js"></script>
+<script src="meals.js"></script>
 </body>
 </html>
