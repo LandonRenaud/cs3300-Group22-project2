@@ -3,7 +3,7 @@ package com.cs3300.project2.meal;
 import java.util.List;
 import java.util.Optional;
 
-/** Storage abstraction for saved meals; in-memory for now, Firestore-ready. */
+/** Storage abstraction for saved meals, backed by Firebase Realtime Database in app runs. */
 public interface MealRepository {
 
     List<Meal> findAll();

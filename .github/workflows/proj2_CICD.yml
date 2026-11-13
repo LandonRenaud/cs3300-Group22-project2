@@ -64,4 +64,4 @@ jobs:
           project_id: ${{ vars.GCP_PROJECT_ID }}
           working_directory: project2
           deliverables: app.yaml
-          flags: --quiet
+          flags: --quiet --set-env-vars=FIREBASE_WEB_API_KEY=${{ secrets.FIREBASE_WEB_API_KEY }},FIREBASE_DATABASE_URL=${{ vars.FIREBASE_DATABASE_URL }}

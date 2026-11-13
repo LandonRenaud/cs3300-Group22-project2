@@ -5,7 +5,7 @@ import java.util.Optional;
 
 /**
  * Storage abstraction for ingredients. The in-memory implementation is used for now;
- * a Firestore-backed implementation can replace it without touching the service or controller.
+ * a Firebase Realtime Database implementation can serve the service and controller.
  */
 public interface IngredientRepository {
 
