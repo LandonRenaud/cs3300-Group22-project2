@@ -7,8 +7,11 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.context.annotation.Profile;
 
+/** Test-only in-memory implementation. This class is not included in the application artifact. */
 @Repository
+@Profile("test")
 public class InMemoryMealRepository implements MealRepository {
 
     private final Map<String, Meal> store = new ConcurrentHashMap<>();

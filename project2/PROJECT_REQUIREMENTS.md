@@ -31,4 +31,6 @@ All features must have junit tests associated with them
 
 ## Other Info
 - API keys and other sensitive information must be hidden from the front-end of the website
-- 
+- Users must sign up and sign in with an email address and password before using the application
+- Ingredient inventory and saved meals must belong to the signed-in user and remain available after an application restart
+- Use the Firebase services associated with the Google Cloud project hosting the website for authentication and persistent storage
