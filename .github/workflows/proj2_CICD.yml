@@ -68,3 +68,4 @@ jobs:
           env_vars: |-
             FIREBASE_WEB_API_KEY=${{ secrets.FIREBASE_WEB_API_KEY }}
             FIREBASE_DATABASE_URL=${{ secrets.FIREBASE_DATABASE_URL }}
+            FDC_API_KEY=${{ secrets.FDC_API_KEY }}

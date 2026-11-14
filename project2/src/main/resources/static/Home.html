@@ -23,21 +23,36 @@
 
         <form id="ingredient-form" class="card">
             <input type="hidden" name="id">
+            <div class="food-search">
+                <label>Search foods <input id="food-search-input" type="search" autocomplete="off" placeholder="Start typing a food name"></label>
+                <div id="food-search-results" class="autocomplete-results" role="listbox" hidden></div>
+                <p id="food-search-status" class="muted" aria-live="polite"></p>
+            </div>
+            <div id="selected-food-facts" class="nutrition-preview" hidden></div>
             <div class="row">
-                <label>Name <input name="name" required maxlength="100" placeholder="e.g. Eggs"></label>
+                <label>Name <input name="name" id="ingredient-name" required maxlength="100" placeholder="e.g. Eggs"></label>
                 <label>Quantity <input name="quantity" type="number" min="0" step="any" required value="1"></label>
                 <label>Unit <input name="unit" placeholder="item, g, cup..."></label>
                 <label>Expires <input name="expirationDate" type="date"></label>
             </div>
-            <fieldset>
-                <legend>Nutrition per unit (optional)</legend>
+            <details id="nutrition-customize" class="nutrition-customize">
+                <summary>Customize nutrition facts</summary>
+                <p class="muted">Nutrition facts use the basis shown in the food details. Custom values are saved with this ingredient.</p>
+                <fieldset>
+                <legend>Nutrition basis and facts</legend>
+                <div class="row">
+                    <label>Basis amount <input name="nutritionBasisAmount" type="number" min="0.001" step="any" placeholder="e.g. 100"></label>
+                    <label>Basis unit <input name="nutritionBasisUnit" placeholder="g, ml, item..."></label>
+                </div>
                 <div class="row">
                     <label>Calories <input name="calories" type="number" min="0" step="any"></label>
                     <label>Protein (g) <input name="proteinGrams" type="number" min="0" step="any"></label>
                     <label>Carbs (g) <input name="carbsGrams" type="number" min="0" step="any"></label>
                     <label>Fat (g) <input name="fatGrams" type="number" min="0" step="any"></label>
                 </div>
-            </fieldset>
+                <div id="extra-nutrients-fields" class="row"></div>
+                </fieldset>
+            </details>
             <div class="actions">
                 <button type="submit" id="ingredient-submit">Add ingredient</button>
                 <button type="button" id="ingredient-cancel" class="secondary" hidden>Cancel edit</button>
@@ -49,7 +64,7 @@
             <table>
                 <thead>
                 <tr>
-                    <th>Name</th><th>On hand</th><th>Expires</th><th>Calories (total)</th><th></th>
+                    <th>Name</th><th>On hand</th><th>Expires</th><th>Calories (per nutrition basis)</th><th></th>
                 </tr>
                 </thead>
                 <tbody id="ingredient-rows"></tbody>
@@ -57,6 +72,10 @@
             <p id="ingredient-empty" class="muted">No ingredients yet. Add what you bought above.</p>
             <p id="nutrition-total" class="muted"></p>
         </div>
+        <dialog id="nutrition-dialog" class="nutrition-dialog">
+            <div class="dialog-header"><h3 id="nutrition-dialog-title">Nutrition facts</h3><button id="nutrition-dialog-close" type="button" class="secondary">Close</button></div>
+            <div id="nutrition-dialog-content"></div>
+        </dialog>
     </section>
 
     <section id="meals">

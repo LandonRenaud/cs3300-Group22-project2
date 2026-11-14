@@ -84,7 +84,7 @@
     }
 
     async function loadAppScripts() {
-        for (const src of ["api.js", "ingredients.js", "meals.js"]) {
+        for (const src of ["api.js", "food-search.js", "ingredients.js", "meals.js"]) {
             await new Promise((resolve, reject) => {
                 const script = document.createElement("script");
                 script.src = src;

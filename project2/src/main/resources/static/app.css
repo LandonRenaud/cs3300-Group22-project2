@@ -111,6 +111,22 @@ td.controls { display: flex; gap: 6px; justify-content: flex-end; }
 .need { color: var(--danger); }
 .meal-card .controls { display: flex; gap: 6px; }
 .meal-line input { min-width: 0; }
+.food-search { position: relative; max-width: 720px; margin-bottom: 12px; }
+.autocomplete-results { position: absolute; z-index: 5; top: 100%; left: 0; right: 0; max-height: 280px; overflow-y: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; box-shadow: 0 6px 18px #0002; }
+.autocomplete-option { display: block; width: 100%; border: 0; border-radius: 0; background: transparent; color: var(--text); text-align: left; padding: 10px 12px; }
+.autocomplete-option + .autocomplete-option { border-top: 1px solid var(--border); }
+.autocomplete-option:hover, .autocomplete-option:focus { background: var(--bg); }
+.nutrition-preview { margin: 12px 0; padding: 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); }
+.nutrition-customize { margin-top: 14px; }
+.nutrition-customize summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+.nutrition-facts { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(100px, 1fr); gap: 4px 16px; margin: 8px 0; }
+.nutrition-facts dt { color: var(--muted); }
+.nutrition-facts dd { margin: 0; }
+.nutrition-dialog { width: min(92vw, 560px); max-height: 80vh; overflow-y: auto; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+.nutrition-dialog::backdrop { background: #0008; }
+.dialog-header { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+.dialog-header h3 { margin: 0; }
+.ingredient-name { padding: 0; border: 0; background: none; color: var(--accent); text-decoration: underline; }
 .auth-page { min-height: 100vh; display: grid; place-items: center; }
 .auth-card { width: min(100%, 440px); }
 .auth-card h1 { margin: 0; font-size: 1.5rem; }

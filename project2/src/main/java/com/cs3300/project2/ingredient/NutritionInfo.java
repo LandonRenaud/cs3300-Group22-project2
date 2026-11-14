@@ -1,31 +1,41 @@
 package com.cs3300.project2.ingredient;
 
-/**
- * Nutrition facts for one unit of an ingredient (e.g. per egg, per 100 g).
- * All values are non-negative; {@link #EMPTY} is used when the user has not supplied any.
- */
-public record NutritionInfo(double calories, double proteinGrams, double carbsGrams, double fatGrams) {
+import java.util.LinkedHashMap;
+import java.util.Map;
 
-    public static final NutritionInfo EMPTY = new NutritionInfo(0, 0, 0, 0);
+/** Nutrition amounts for one declared basis. Extra nutrients retain their source label and unit. */
+public record NutritionInfo(
+        double calories,
+        double proteinGrams,
+        double carbsGrams,
+        double fatGrams,
+        Map<String, NutrientValue> additionalNutrients) {
+
+    public static final NutritionInfo EMPTY = new NutritionInfo(0, 0, 0, 0, Map.of());
+
+    public NutritionInfo(double calories, double proteinGrams, double carbsGrams, double fatGrams) {
+        this(calories, proteinGrams, carbsGrams, fatGrams, Map.of());
+    }
 
     public NutritionInfo {
         requireNonNegative(calories, "calories");
         requireNonNegative(proteinGrams, "proteinGrams");
         requireNonNegative(carbsGrams, "carbsGrams");
         requireNonNegative(fatGrams, "fatGrams");
+        additionalNutrients = additionalNutrients == null ? Map.of() : Map.copyOf(additionalNutrients);
     }
 
-    /** Nutrition for {@code amount} units of this ingredient. */
-    public NutritionInfo scaledBy(double amount) {
-        return new NutritionInfo(calories * amount, proteinGrams * amount, carbsGrams * amount, fatGrams * amount);
+    public NutritionInfo scaledBy(double factor) {
+        Map<String, NutrientValue> scaled = new LinkedHashMap<>();
+        additionalNutrients.forEach((key, value) -> scaled.put(key, value.scaledBy(factor)));
+        return new NutritionInfo(calories * factor, proteinGrams * factor, carbsGrams * factor, fatGrams * factor, scaled);
     }
 
     public NutritionInfo plus(NutritionInfo other) {
-        return new NutritionInfo(
-                calories + other.calories,
-                proteinGrams + other.proteinGrams,
-                carbsGrams + other.carbsGrams,
-                fatGrams + other.fatGrams);
+        Map<String, NutrientValue> sum = new LinkedHashMap<>(additionalNutrients);
+        other.additionalNutrients.forEach((key, value) -> sum.merge(key, value, NutrientValue::plus));
+        return new NutritionInfo(calories + other.calories, proteinGrams + other.proteinGrams,
+                carbsGrams + other.carbsGrams, fatGrams + other.fatGrams, sum);
     }
 
     private static void requireNonNegative(double value, String field) {

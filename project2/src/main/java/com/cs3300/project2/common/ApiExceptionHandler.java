@@ -5,6 +5,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.cs3300.project2.food.FoodDataException;
 
 /** Turns domain exceptions into RFC 9457 problem responses with a readable {@code detail}. */
 @RestControllerAdvice
@@ -25,5 +26,10 @@ public class ApiExceptionHandler {
         Throwable cause = ex.getMostSpecificCause();
         String detail = cause instanceof IllegalArgumentException ? cause.getMessage() : "Malformed request body";
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detail);
+    }
+
+    @ExceptionHandler(FoodDataException.class)
+    public ProblemDetail handleFoodData(FoodDataException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_GATEWAY, ex.getMessage());
     }
 }
