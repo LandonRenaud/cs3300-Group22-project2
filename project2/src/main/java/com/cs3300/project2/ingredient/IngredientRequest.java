@@ -8,5 +8,12 @@ public record IngredientRequest(
         Double quantity,
         String unit,
         NutritionInfo nutritionPerUnit,
-        LocalDate expirationDate) {
+        LocalDate expirationDate,
+        NutritionBasis nutritionBasis,
+        NutritionSource nutritionSource) {
+
+    public IngredientRequest(String name, Double quantity, String unit,
+                             NutritionInfo nutritionPerUnit, LocalDate expirationDate) {
+        this(name, quantity, unit, nutritionPerUnit, expirationDate, null, null);
+    }
 }

@@ -28,13 +28,17 @@ public class IngredientFactory {
         if (request == null) {
             throw new IllegalArgumentException("Ingredient details are required");
         }
+        String unit = normalizeUnit(request.unit());
+        NutritionInfo nutrition = request.nutritionPerUnit() == null ? NutritionInfo.EMPTY : request.nutritionPerUnit();
         return new Ingredient(
                 id,
                 normalizeName(request.name()),
                 validateQuantity(request.quantity()),
-                normalizeUnit(request.unit()),
-                request.nutritionPerUnit() == null ? NutritionInfo.EMPTY : request.nutritionPerUnit(),
-                request.expirationDate());
+                unit,
+                nutrition,
+                request.expirationDate(),
+                request.nutritionBasis() == null ? new NutritionBasis(1, unit, "per " + unit) : request.nutritionBasis(),
+                request.nutritionSource());
     }
 
     public static String normalizeName(String name) {

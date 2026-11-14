@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.LocalDate;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
@@ -41,6 +42,21 @@ class IngredientFactoryTest {
 
         assertEquals(nutrition, ingredient.nutritionPerUnit());
         assertEquals(expires, ingredient.expirationDate());
+    }
+
+    @Test
+    void preservesImportedFactsBasisAndSource() {
+        NutritionInfo facts = new NutritionInfo(379, 13.2, 67.7, 6.5,
+                Map.of("usda_1079", new NutrientValue("Fiber, total dietary", 10.1, "g")));
+        NutritionBasis basis = new NutritionBasis(100, "g", "per 100 g");
+        NutritionSource source = new NutritionSource("USDA_FDC", "123", "Oats", "2026-11-14T12:00:00Z");
+
+        Ingredient ingredient = factory.create(new IngredientRequest("Oats", 500.0, "g", facts, null, basis, source));
+
+        assertEquals(facts, ingredient.nutritionPerUnit());
+        assertEquals(basis, ingredient.nutritionBasis());
+        assertEquals(source, ingredient.nutritionSource());
+        assertEquals(50.5, ingredient.totalNutrition().additionalNutrients().get("usda_1079").amount(), 1e-9);
     }
 
     @Test

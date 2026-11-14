@@ -92,4 +92,20 @@ class IngredientServiceTest {
     void totalNutritionOfEmptyPantryIsZero() {
         assertEquals(NutritionInfo.EMPTY, service.totalNutrition());
     }
+
+    @Test
+    void totalNutritionConvertsMetricInventoryToImportedBasis() {
+        service.add(new IngredientRequest("Rice", 0.5, "kg", new NutritionInfo(360, 7, 80, 1), null,
+                new NutritionBasis(100, "g", "per 100 g"), null));
+
+        assertEquals(1800, service.totalNutrition().calories(), 1e-9);
+    }
+
+    @Test
+    void incompatibleNutritionBasisIsExcludedFromInventoryTotals() {
+        service.add(new IngredientRequest("Flour", 2.0, "cup", new NutritionInfo(100, 2, 20, 1), null,
+                new NutritionBasis(100, "g", "per 100 g"), null));
+
+        assertEquals(NutritionInfo.EMPTY, service.totalNutrition());
+    }
 }
