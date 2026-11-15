@@ -3,6 +3,7 @@
     const rows = document.getElementById("ingredient-rows");
     const empty = document.getElementById("ingredient-empty");
     const totals = document.getElementById("nutrition-total");
+    const expirySummary = document.getElementById("expiry-summary");
     const errorBox = document.getElementById("ingredient-error");
     const submit = document.getElementById("ingredient-submit");
     const cancel = document.getElementById("ingredient-cancel");
@@ -10,6 +11,7 @@
     const extraFields = document.getElementById("extra-nutrients-fields");
     const dialog = document.getElementById("nutrition-dialog");
     let ingredients = [];
+    let expiry = new Map();
     let selectedNutrition = null;
 
     function readNutritionFields() {
@@ -168,11 +170,24 @@
         catch (err) { errorBox.textContent = err.message; }
     }
 
+    function expiryBadge(item) {
+        const info = expiry.get(item.id);
+        if (!info || info.status === "NO_DATE") {
+            return "—";
+        }
+        const days = info.daysLeft;
+        const label = days < 0 ? `expired ${-days}d ago`
+            : days === 0 ? "expires today"
+            : `${days}d left`;
+        return el("span", { class: `badge ${info.status.toLowerCase().replace("_", "-")}`, title: info.expirationDate },
+            label);
+    }
+
     function render() {
         rows.replaceChildren(...ingredients.map((item) => el("tr", {},
             el("td", {}, el("button", { type: "button", class: "ingredient-name", onclick: () => showIngredientFacts(item) }, item.name)),
             el("td", {}, `${formatNumber(item.quantity)} ${item.unit}`),
-            el("td", {}, item.expirationDate || "—"),
+            el("td", {}, expiryBadge(item)),
             el("td", {}, `${formatNumber(item.nutritionPerUnit.calories)} kcal (${item.nutritionBasis?.label || `per ${item.unit}`})`),
             el("td", { class: "controls" },
                 el("button", { class: "small secondary", title: "Used one", onclick: () => run(() => api(`/api/ingredients/${item.id}/quantity`, { method: "PATCH", body: JSON.stringify({ delta: -1 }) })) }, "−1"),
@@ -186,7 +201,15 @@
 
     async function refresh() {
         ingredients = await api("/api/ingredients");
+        const report = await api("/api/ingredients/expiry");
+        expiry = new Map(report.map((info) => [info.id, info]));
         render();
+        const expired = report.filter((info) => info.status === "EXPIRED").length;
+        const soon = report.filter((info) => info.status === "EXPIRING_SOON").length;
+        expirySummary.textContent = [
+            expired ? `${expired} expired` : "",
+            soon ? `${soon} expiring within 3 days` : "",
+        ].filter(Boolean).join(" · ");
         const n = await api("/api/ingredients/nutrition");
         totals.textContent = ingredients.length
             ? `On hand in total (compatible units): ${formatNumber(n.calories)} kcal · ${formatNumber(n.proteinGrams)} g protein · `

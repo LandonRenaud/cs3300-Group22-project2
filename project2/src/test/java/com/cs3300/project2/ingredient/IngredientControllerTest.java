@@ -8,6 +8,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -71,6 +73,25 @@ class IngredientControllerTest {
         mvc.perform(get("/api/ingredients/nutrition"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.calories").value(700.0));
+    }
+
+    @Test
+    void expiryReportFlagsExpiredAndUndatedIngredients() throws Exception {
+        mvc.perform(post("/api/ingredients")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\": \"Milk\", \"quantity\": 1, \"expirationDate\": \""
+                        + LocalDate.now().minusDays(1) + "\"}"));
+        mvc.perform(post("/api/ingredients")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"name\": \"Salt\", \"quantity\": 1}"));
+
+        mvc.perform(get("/api/ingredients/expiry"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].name").value("Milk"))
+                .andExpect(jsonPath("$[0].daysLeft").value(-1))
+                .andExpect(jsonPath("$[0].status").value("EXPIRED"))
+                .andExpect(jsonPath("$[1].status").value("NO_DATE"));
     }
 
     @Test

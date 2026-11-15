@@ -7,6 +7,7 @@
     --accent: #2f7d4f;
     --accent-text: #ffffff;
     --danger: #b3261e;
+    --warning: #9a6200;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,6 +20,7 @@
         --accent: #5cb582;
         --accent-text: #0d1a12;
         --danger: #f2948c;
+        --warning: #e8b45a;
     }
 }
 
@@ -135,3 +137,8 @@ td.controls { display: flex; gap: 6px; justify-content: flex-end; }
 .welcome-actions { display: flex; justify-content: center; gap: 12px; margin-top: 22px; }
 .auth-links { margin: 16px 0 0; font-size: 0.9rem; }
 .auth-links a { color: var(--accent); }
+.badge { display: inline-block; padding: 0 8px; border-radius: 999px; font-size: 0.8rem; border: 1px solid currentColor; }
+.badge.expired { color: var(--danger); font-weight: 600; }
+.badge.expiring-soon { color: var(--warning); }
+.badge.fresh { color: var(--accent); }
+#expiry-summary:empty { display: none; }
