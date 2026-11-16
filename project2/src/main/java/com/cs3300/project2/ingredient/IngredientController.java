@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class IngredientController {
 
     private final IngredientService service;
+    private final ExpiryTracker expiryTracker;
 
-    public IngredientController(IngredientService service) {
+    public IngredientController(IngredientService service, ExpiryTracker expiryTracker) {
         this.service = service;
+        this.expiryTracker = expiryTracker;
     }
 
     @GetMapping
@@ -32,6 +34,11 @@ public class IngredientController {
     @GetMapping("/nutrition")
     public NutritionInfo totalNutrition() {
         return service.totalNutrition();
+    }
+
+    @GetMapping("/expiry")
+    public List<IngredientExpiry> expiry() {
+        return expiryTracker.report();
     }
 
     @GetMapping("/{id}")
