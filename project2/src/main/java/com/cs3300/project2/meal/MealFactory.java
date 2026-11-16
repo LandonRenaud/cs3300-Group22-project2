@@ -4,6 +4,7 @@ import static com.cs3300.project2.ingredient.IngredientFactory.normalizeName;
 import static com.cs3300.project2.ingredient.IngredientFactory.normalizeUnit;
 import static com.cs3300.project2.ingredient.IngredientFactory.validateQuantity;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -62,7 +63,8 @@ public class MealFactory {
             }
             MealIngredient line = new MealIngredient(
                     normalizeName(item.name()), validateQuantity(item.quantity()), normalizeUnit(item.unit()));
-            merged.merge(key(line), line, (a, b) -> new MealIngredient(a.name(), a.quantity() + b.quantity(), a.unit()));
+            merged.merge(key(line), line, (a, b) -> new MealIngredient(a.name(), validateQuantity(
+                    BigDecimal.valueOf(a.quantity()).add(BigDecimal.valueOf(b.quantity())).doubleValue()), a.unit()));
         }
         return new ArrayList<>(merged.values());
     }

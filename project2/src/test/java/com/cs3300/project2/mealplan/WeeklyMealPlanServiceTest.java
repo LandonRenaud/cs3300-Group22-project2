@@ -162,6 +162,24 @@ class WeeklyMealPlanServiceTest {
     }
 
     @Test
+    void duplicateDecimalLinesDoNotCreatePhantomShoppingItems() {
+        meals.add(new MealRequest("Rice bowl", null, List.of(
+                new MealRequest.Item("Rice", 0.1, "cup"), new MealRequest.Item("rice", 0.2, "cup"))));
+        stock("Rice", 2.1, "cup", null);
+        WeeklyMealPlan plan = planner.generate(START, PlanningStrategy.EXPIRY_FIRST);
+        assertTrue(plan.shoppingList().isEmpty());
+        assertEquals(0.3, plan.days().getFirst().ingredients().getFirst().needed());
+    }
+
+    @Test
+    void rejectsWeeklyTotalsThatCannotBeRepresentedAsFiniteQuantities() {
+        meal("Oversized recipe", "Rice", 3e307, "cup");
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
+                () -> planner.generate(START, PlanningStrategy.EXPIRY_FIRST));
+        assertEquals("Weekly ingredient quantities exceed the supported range", error.getMessage());
+    }
+
+    @Test
     void ignoresRecipesWithNoPositiveIngredientQuantities() {
         meal("Empty", "Rice", 0, "cup");
         assertTrue(planner.generate(START, PlanningStrategy.EXPIRY_FIRST).days().isEmpty());

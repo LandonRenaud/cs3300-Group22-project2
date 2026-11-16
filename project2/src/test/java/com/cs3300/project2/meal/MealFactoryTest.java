@@ -46,6 +46,13 @@ class MealFactoryTest {
     }
 
     @Test
+    void rejectsDuplicateQuantitiesThatOverflowWhenMerged() {
+        assertThrows(IllegalArgumentException.class, () -> factory.create(request("Oversized recipe",
+                new MealRequest.Item("Rice", Double.MAX_VALUE, "cup"),
+                new MealRequest.Item("rice", Double.MAX_VALUE, "cup"))));
+    }
+
+    @Test
     void sameNameDifferentUnitIsNotMerged() {
         Meal meal = factory.create(request("Cake",
                 new MealRequest.Item("Sugar", 1.0, "cup"),

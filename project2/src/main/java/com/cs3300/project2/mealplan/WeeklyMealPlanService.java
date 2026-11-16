@@ -100,7 +100,11 @@ public class WeeklyMealPlanService {
     }
 
     private static double sum(double a, double b) {
-        return BigDecimal.valueOf(a).add(BigDecimal.valueOf(b)).doubleValue();
+        double total = BigDecimal.valueOf(a).add(BigDecimal.valueOf(b)).doubleValue();
+        if (!Double.isFinite(total)) {
+            throw new IllegalArgumentException("Weekly ingredient quantities exceed the supported range");
+        }
+        return total;
     }
 
     private record Allocation(List<IngredientNeed> needs, LocalDate earliestExpiry, double coverage) {
