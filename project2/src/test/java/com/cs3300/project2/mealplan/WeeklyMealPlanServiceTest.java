@@ -31,7 +31,7 @@ class WeeklyMealPlanServiceTest {
     void setUp() {
         pantry = new IngredientService(new InMemoryIngredientRepository(), new IngredientFactory());
         meals = new MealService(new InMemoryMealRepository(), new MealFactory(), pantry);
-        planner = new WeeklyMealPlanService(meals, pantry);
+        planner = new WeeklyMealPlanService(meals, pantry, new MealPlanFactory());
     }
 
     private Ingredient stock(String name, double quantity, String unit, LocalDate expiry) {

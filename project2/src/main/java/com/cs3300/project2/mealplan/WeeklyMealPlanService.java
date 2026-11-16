@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -24,10 +23,12 @@ import com.cs3300.project2.mealplan.WeeklyMealPlan.IngredientNeed;
 public class WeeklyMealPlanService {
     private final MealService meals;
     private final IngredientService ingredients;
+    private final MealPlanFactory factory;
 
-    public WeeklyMealPlanService(MealService meals, IngredientService ingredients) {
+    public WeeklyMealPlanService(MealService meals, IngredientService ingredients, MealPlanFactory factory) {
         this.meals = meals;
         this.ingredients = ingredients;
+        this.factory = factory;
     }
 
     public WeeklyMealPlan generate(LocalDate startDate, PlanningStrategy strategy) {
@@ -41,14 +42,13 @@ public class WeeklyMealPlanService {
         List<Meal> recipes = meals.findAll(null).stream()
                 .filter(m -> m.ingredients().stream().anyMatch(i -> i.quantity() > 0)).toList();
         if (recipes.isEmpty()) {
-            return new WeeklyMealPlan(startDate, strategy, List.of(), List.of());
+            return factory.empty(startDate, strategy);
         }
         List<Stock> pantry = ingredients.findAll().stream()
                 .sorted(Comparator.comparing(Ingredient::expirationDate,
                         Comparator.nullsLast(Comparator.naturalOrder())).thenComparing(Ingredient::id))
                 .map(Stock::new).toList();
         Map<String, Integer> uses = new HashMap<>();
-        Map<Key, IngredientNeed> totals = new LinkedHashMap<>();
         List<WeeklyMealPlan.Day> days = new ArrayList<>();
         for (int offset = 0; offset < 7; offset++) {
             LocalDate date = startDate.plusDays(offset);
@@ -61,16 +61,10 @@ public class WeeklyMealPlanService {
             }
             Meal selected = strategy.select(candidates).meal();
             Allocation allocation = allocate(selected, pantry, date);
-            days.add(new WeeklyMealPlan.Day(date, selected, allocation.needs()));
+            days.add(factory.day(date, selected, allocation.needs()));
             uses.merge(selected.id(), 1, Integer::sum);
-            for (IngredientNeed need : allocation.needs()) {
-                totals.merge(new Key(need.name(), need.unit()), need, (a, b) -> new IngredientNeed(
-                        a.name(), a.unit(), sum(a.needed(), b.needed()), sum(a.fromPantry(), b.fromPantry()),
-                        sum(a.toBuy(), b.toBuy())));
-            }
         }
-        List<IngredientNeed> shopping = totals.values().stream().filter(n -> n.toBuy() > 0).toList();
-        return new WeeklyMealPlan(startDate, strategy, days, shopping);
+        return factory.create(startDate, strategy, days);
     }
 
     private static Allocation allocate(Meal meal, List<Stock> pantry, LocalDate date) {
@@ -97,14 +91,6 @@ public class WeeklyMealPlanService {
             needs.add(new IngredientNeed(line.name(), line.unit(), line.quantity(), allocated, missing.doubleValue()));
         }
         return new Allocation(needs, earliest, needs.isEmpty() ? 0 : coverage / needs.size());
-    }
-
-    private static double sum(double a, double b) {
-        double total = BigDecimal.valueOf(a).add(BigDecimal.valueOf(b)).doubleValue();
-        if (!Double.isFinite(total)) {
-            throw new IllegalArgumentException("Weekly ingredient quantities exceed the supported range");
-        }
-        return total;
     }
 
     private record Allocation(List<IngredientNeed> needs, LocalDate earliestExpiry, double coverage) {
