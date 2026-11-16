@@ -164,7 +164,11 @@
 
     async function run(action) {
         errorBox.textContent = "";
-        try { await action(); await refresh(); }
+        try {
+            await action();
+            document.dispatchEvent(new CustomEvent("ingredients-changed"));
+            await refresh();
+        }
         catch (err) { errorBox.textContent = err.message; }
     }
 
@@ -192,7 +196,6 @@
             ? `On hand in total (compatible units): ${formatNumber(n.calories)} kcal · ${formatNumber(n.proteinGrams)} g protein · `
               + `${formatNumber(n.carbsGrams)} g carbs · ${formatNumber(n.fatGrams)} g fat`
             : "";
-        document.dispatchEvent(new CustomEvent("ingredients-changed", { detail: ingredients }));
     }
 
     form.addEventListener("submit", (event) => {

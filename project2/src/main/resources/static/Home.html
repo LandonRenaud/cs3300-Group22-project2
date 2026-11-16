@@ -13,6 +13,7 @@
     <nav>
         <a href="#ingredients">Ingredients</a>
         <a href="#meals">Meals</a>
+        <a href="#weekly-plan">Weekly plan</a>
     </nav>
     <div class="account"><button id="logout" class="small secondary">Log out</button></div>
 </header>
@@ -104,6 +105,31 @@
         <p id="meal-empty" class="muted">No saved meals yet.</p>
     </section>
 
+    <section id="weekly-plan">
+        <h2>Weekly Meal Plan</h2>
+        <p class="muted">Plan one saved recipe per day. Recipes may repeat. This preview does not change your inventory.</p>
+        <form id="weekly-plan-form" class="card">
+            <div class="row">
+                <label>Week starts <input name="startDate" type="date" min="0001-01-01" max="9999-12-25" required></label>
+                <label>Planning priority
+                    <select name="strategy">
+                        <option value="EXPIRY_FIRST">Use food expiring soonest</option>
+                        <option value="PANTRY_FIRST">Prioritize pantry coverage</option>
+                    </select>
+                </label>
+            </div>
+            <div class="actions"><button id="weekly-plan-submit" type="submit">Generate weekly plan</button></div>
+            <p id="weekly-plan-status" class="muted" role="status"></p>
+            <p id="weekly-plan-error" class="error" role="alert"></p>
+        </form>
+        <div id="weekly-plan-results" hidden>
+            <div id="weekly-plan-days"></div>
+            <div class="card">
+                <h3>Shopping list for the week</h3>
+                <ul id="weekly-plan-shopping"></ul>
+            </div>
+        </div>
+    </section>
 </main>
 
 <script src="auth.js"></script>

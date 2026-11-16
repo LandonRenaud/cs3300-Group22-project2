@@ -79,7 +79,7 @@
                     el("button", { class: "small secondary", onclick: () => startEdit(meal) }, "Edit"),
                     el("button", {
                         class: "small danger",
-                        onclick: () => run(() => api(`/api/meals/${meal.id}`, { method: "DELETE" })),
+                        onclick: () => run(() => api(`/api/meals/${meal.id}`, { method: "DELETE" }), true),
                     }, "Delete"),
                 ),
             ),
@@ -96,10 +96,11 @@
         empty.textContent = query ? "No meals match your search." : "No saved meals yet.";
     }
 
-    async function run(action) {
+    async function run(action, changesMeals = false) {
         errorBox.textContent = "";
         try {
             await action();
+            if (changesMeals) document.dispatchEvent(new CustomEvent("meals-changed"));
             await refresh();
         } catch (err) {
             errorBox.textContent = err.message;
@@ -115,7 +116,7 @@
                 ? api(`/api/meals/${id}`, { method: "PUT", body })
                 : api("/api/meals", { method: "POST", body }));
             resetForm();
-        });
+        }, true);
     });
 
     document.getElementById("meal-add-line").addEventListener("click", () => addLine());
