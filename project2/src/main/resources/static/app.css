@@ -63,7 +63,7 @@ section { margin-bottom: 40px; }
 
 label { display: flex; flex-direction: column; font-size: 0.875rem; color: var(--muted); gap: 4px; }
 
-input, textarea {
+input, textarea, select {
     font: inherit;
     color: var(--text);
     background: var(--bg);
