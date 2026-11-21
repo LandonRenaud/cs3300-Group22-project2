@@ -60,6 +60,14 @@ The Firebase keys and USDA API key are read by the Spring Boot server from envir
 
 Food search uses USDA FoodData Central generic records (Foundation Foods, FNDDS, and SR Legacy) and branded records. Search results show generic foods first and branded products in a separate group. Search waits 700 ms after typing stops, and repeated query results and food details are cached server-side to reduce API requests. Selecting a result in the pantry imports its nutrition facts; the search phrase remains the pantry ingredient name, while the selected USDA description and FDC ID are saved as nutrition provenance. Meal ingredient fields use the same food autocomplete and save the search phrase, while pantry entries can also be selected to copy their exact name and unit. Pantry matching ignores units and compares ingredient names case-insensitively. Quantity values are compared directly without unit conversion. Quantity and expiry date remain user-entered inventory data. Nutrition facts are saved as a snapshot with their basis and source so later edits do not depend on a live USDA lookup.
 
+## Saved-meal shopping lists
+
+In **Planner → Saved meals**, select a **Cooking date** to check each recipe against the pantry on that day. The date starts at today in the browser. Expired batches are excluded; batches expiring on the selected day and undated batches remain eligible. Changing the date, searching meals, or editing inventory refreshes the results. Each meal is checked independently and no stock is deducted.
+
+`GET /api/meals/{id}/shopping-list?onDate=2026-11-21` returns the existing `needed`, `onHand`, and `toBuy` fields. Omitting `onDate` uses today from the application's clock, consistent with the expiry tracker. Dates must be valid ISO dates within years 0001 to 9999. `onHand` is eligible stock remaining before the current recipe line; earlier lines in the same recipe cannot reuse it. Matching continues to ignore case and units, with no unit conversion. Decimal quantities are calculated without binary subtraction artifacts; unrepresentable pantry totals return HTTP 400.
+
+For example, a recipe needing 3 eggs with 5 expired eggs and 1 eligible egg shows 1 on hand and 2 to buy. An egg batch expiring today is available for today's recipe but excluded when checking tomorrow.
+
 ## Weekly meal planning
 
 After saving recipes and pantry ingredients, open **Weekly plan**, choose the start date and priority, and select **Generate weekly plan**. The preview contains one saved recipe per day for seven days and a combined shopping list. Recipes may repeat. Editing meals, ingredients, or planning options clears the previous preview so it can be regenerated from current data.

@@ -1,9 +1,13 @@
 package com.cs3300.project2.meal;
 
+import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -17,11 +21,13 @@ public class MealService {
     private final MealRepository repository;
     private final MealFactory factory;
     private final IngredientService ingredients;
+    private final Clock clock;
 
-    public MealService(MealRepository repository, MealFactory factory, IngredientService ingredients) {
+    public MealService(MealRepository repository, MealFactory factory, IngredientService ingredients, Clock clock) {
         this.repository = repository;
         this.factory = factory;
         this.ingredients = ingredients;
+        this.clock = clock;
     }
 
     /**
@@ -60,20 +66,39 @@ public class MealService {
         }
     }
 
-    /** Compares a meal's ingredients with the pantry so the user knows what to pick up at the store. */
+    /** Compares a meal with stock that is usable today, without changing saved quantities. */
     public List<ShoppingListItem> shoppingList(String id) {
-        Meal meal = findById(id);
-        Map<String, Double> pantry = ingredients.findAll().stream()
-                .collect(Collectors.groupingBy(ingredient -> MealFactory.ingredientNameKey(ingredient.name()),
-                        Collectors.summingDouble(Ingredient::quantity)));
+        return shoppingList(id, null);
+    }
 
-        return meal.ingredients().stream()
-                .map(line -> {
-                    double onHand = pantry.getOrDefault(MealFactory.ingredientNameKey(line.name()), 0.0);
-                    return new ShoppingListItem(line.name(), line.unit(), line.quantity(), onHand,
-                            Math.max(0, line.quantity() - onHand));
-                })
-                .toList();
+    /** Stock remains usable on its expiry date; undated stock is included. */
+    public List<ShoppingListItem> shoppingList(String id, LocalDate onDate) {
+        LocalDate date = onDate == null ? LocalDate.now(clock) : onDate;
+        if (date.getYear() < 1 || date.getYear() > 9999) {
+            throw new IllegalArgumentException("Cooking date must be within years 0001 to 9999");
+        }
+        Meal meal = findById(id);
+        Map<String, BigDecimal> pantry = new HashMap<>();
+        for (Ingredient ingredient : ingredients.findAll()) {
+            if (ingredient.expirationDate() != null && ingredient.expirationDate().isBefore(date)) continue;
+            pantry.merge(MealFactory.ingredientNameKey(ingredient.name()),
+                    BigDecimal.valueOf(ingredient.quantity()), BigDecimal::add);
+        }
+
+        List<ShoppingListItem> list = new ArrayList<>();
+        for (MealIngredient line : meal.ingredients()) {
+            String key = MealFactory.ingredientNameKey(line.name());
+            BigDecimal onHand = pantry.getOrDefault(key, BigDecimal.ZERO);
+            if (!Double.isFinite(onHand.doubleValue())) {
+                throw new IllegalArgumentException("Available pantry quantity is too large for a shopping list");
+            }
+            BigDecimal needed = BigDecimal.valueOf(line.quantity());
+            BigDecimal used = needed.min(onHand);
+            pantry.put(key, onHand.subtract(used));
+            list.add(new ShoppingListItem(line.name(), line.unit(), line.quantity(), onHand.doubleValue(),
+                    needed.subtract(used).doubleValue()));
+        }
+        return list;
     }
     private static boolean contains(String text, String lowerNeedle) {
         return text.toLowerCase(Locale.ROOT).contains(lowerNeedle);
