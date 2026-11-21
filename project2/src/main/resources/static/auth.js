@@ -150,6 +150,26 @@
             clearSession();
             location.replace("/Welcome.html");
         });
+        const views = [...document.querySelectorAll(".app-view")];
+        document.querySelectorAll(".nav-tab").forEach((tab) => tab.addEventListener("click", () => {
+            document.querySelectorAll(".nav-tab").forEach((item) => {
+                const active = item === tab;
+                item.classList.toggle("active", active);
+                if (active) item.setAttribute("aria-current", "page");
+                else item.removeAttribute("aria-current");
+            });
+            views.forEach((view) => { view.hidden = view.id !== `${tab.dataset.view}-view`; });
+        }));
+        document.querySelectorAll(".planner-tab").forEach((tab) => tab.addEventListener("click", () => {
+            document.querySelectorAll(".planner-tab").forEach((item) => {
+                const active = item === tab;
+                item.classList.toggle("active", active);
+                item.setAttribute("aria-selected", String(active));
+            });
+            document.querySelectorAll(".planner-section").forEach((section) => {
+                section.hidden = section.id !== tab.dataset.section;
+            });
+        }));
         try {
             await loadAppScripts();
         } catch (err) {

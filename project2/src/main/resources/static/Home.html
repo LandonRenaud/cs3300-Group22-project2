@@ -3,26 +3,32 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Meal Prep Planner</title>
+    <title>Gather | Pantry & Planner</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="stylesheet" href="app.css">
 </head>
 <body data-page="home">
-<header hidden>
-    <h1>Meal Prep Planner</h1>
-    <nav>
-        <a href="#ingredients">Ingredients</a>
-        <a href="#meals">Meals</a>
-        <a href="#weekly-plan">Weekly plan</a>
+<header hidden class="app-header">
+    <a class="brand" href="/Home.html" aria-label="Gather home"><span class="brand-mark">g</span><span>gather</span></a>
+    <nav class="primary-nav" aria-label="Main navigation">
+        <button class="nav-tab active" type="button" data-view="pantry" aria-current="page">Pantry</button>
+        <button class="nav-tab" type="button" data-view="planner">Planner</button>
     </nav>
     <div class="account"><button id="logout" class="small secondary">Log out</button></div>
 </header>
 
 <main id="home-content" hidden>
-    <section id="ingredients">
-        <h2>Ingredient Tracker</h2>
+    <section id="pantry-view" class="app-view">
+        <div class="page-intro">
+            <p class="eyebrow">YOUR KITCHEN, IN SYNC</p>
+            <h1>Your pantry</h1>
+            <p class="muted">Keep track of what you have and what needs using soon.</p>
+        </div>
+        <section id="ingredients" class="workspace-section">
+        <div class="section-heading"><div><p class="eyebrow">INVENTORY</p><h2>Food on hand</h2></div><a class="jump-link" href="#add-food">+ Add food</a></div>
 
-        <form id="ingredient-form" class="card">
+        <form id="ingredient-form" class="card form-card">
+            <div class="form-heading" id="add-food"><h3>Add to your pantry</h3><p class="muted">Include an expiry date to get useful freshness reminders.</p></div>
             <input type="hidden" name="id">
             <div class="food-search">
                 <label>Search foods <input id="food-search-input" type="search" autocomplete="off" placeholder="Start typing a food name"></label>
@@ -31,10 +37,10 @@
             </div>
             <div id="selected-food-facts" class="nutrition-preview" hidden></div>
             <div class="row">
-                <label>Name <input name="name" id="ingredient-name" required maxlength="100" placeholder="e.g. Eggs"></label>
+                <label>Food name <input name="name" id="ingredient-name" required maxlength="100" placeholder="e.g. Eggs"></label>
                 <label>Quantity <input name="quantity" type="number" min="0" step="any" required value="1"></label>
                 <label>Unit <input name="unit" placeholder="item, g, cup..."></label>
-                <label>Expires <input name="expirationDate" type="date"></label>
+                <label>Expiry date <input name="expirationDate" type="date"></label>
             </div>
             <details id="nutrition-customize" class="nutrition-customize">
                 <summary>Customize nutrition facts</summary>
@@ -55,17 +61,18 @@
                 </fieldset>
             </details>
             <div class="actions">
-                <button type="submit" id="ingredient-submit">Add ingredient</button>
+                <button type="submit" id="ingredient-submit">Add food</button>
                 <button type="button" id="ingredient-cancel" class="secondary" hidden>Cancel edit</button>
                 <span id="ingredient-error" class="error" role="alert"></span>
             </div>
         </form>
 
-        <div class="card">
+        <div class="card inventory-card">
+            <div class="inventory-heading"><div><h3>Pantry inventory</h3><p class="muted">Your saved foods, quantities and freshness.</p></div><span class="inventory-label">LIVE INVENTORY</span></div>
             <table>
                 <thead>
                 <tr>
-                    <th>Name</th><th>On hand</th><th>Expires</th><th>Calories (per nutrition basis)</th><th></th>
+                    <th>Food</th><th>On hand</th><th>Expiry</th><th>Calories (per nutrition basis)</th><th></th>
                 </tr>
                 </thead>
                 <tbody id="ingredient-rows"></tbody>
@@ -78,10 +85,21 @@
             <div class="dialog-header"><h3 id="nutrition-dialog-title">Nutrition facts</h3><button id="nutrition-dialog-close" type="button" class="secondary">Close</button></div>
             <div id="nutrition-dialog-content"></div>
         </dialog>
+        </section>
     </section>
 
-    <section id="meals">
-        <h2>Saved Meals</h2>
+    <section id="planner-view" class="app-view" hidden>
+        <div class="page-intro">
+            <p class="eyebrow">MAKE THE MOST OF WHAT YOU HAVE</p>
+            <h1>Your planner</h1>
+            <p class="muted">Save your meals, map out the week, and see what you need to shop for.</p>
+        </div>
+        <div class="planner-nav" role="tablist" aria-label="Planner sections">
+            <button class="planner-tab active" type="button" data-section="meals" role="tab" aria-selected="true">Saved meals</button>
+            <button class="planner-tab" type="button" data-section="weekly-plan" role="tab" aria-selected="false">Weekly plan</button>
+        </div>
+    <section id="meals" class="workspace-section planner-section">
+        <div class="section-heading"><div><p class="eyebrow">YOUR RECIPES</p><h2>Saved meals</h2></div></div>
 
         <form id="meal-form" class="card">
             <input type="hidden" name="id">
@@ -107,8 +125,8 @@
         <p id="meal-empty" class="muted">No saved meals yet.</p>
     </section>
 
-    <section id="weekly-plan">
-        <h2>Weekly Meal Plan</h2>
+    <section id="weekly-plan" class="workspace-section planner-section" hidden>
+        <div class="section-heading"><div><p class="eyebrow">PLAN AHEAD</p><h2>Weekly plan</h2></div></div>
         <p class="muted">Plan one saved recipe per day. Recipes may repeat. This preview does not change your inventory.</p>
         <form id="weekly-plan-form" class="card">
             <div class="row">
@@ -131,6 +149,7 @@
                 <ul id="weekly-plan-shopping"></ul>
             </div>
         </div>
+    </section>
     </section>
 </main>
 

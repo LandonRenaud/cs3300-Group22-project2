@@ -61,7 +61,7 @@
         preview.hidden = true;
         document.getElementById("food-search-input").value = "";
         document.getElementById("food-search-status").textContent = "";
-        submit.textContent = "Add ingredient";
+        submit.textContent = "Add food";
         cancel.hidden = true;
         errorBox.textContent = "";
     }
