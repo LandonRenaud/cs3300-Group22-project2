@@ -7,10 +7,38 @@
     const errorBox = document.getElementById("meal-error");
     const submit = document.getElementById("meal-submit");
     const cancel = document.getElementById("meal-cancel");
+    let pantryIngredients = [];
+
+    function pantryChoice(item) {
+        return `${item.name} — ${formatNumber(item.quantity)} ${item.unit}`;
+    }
+
+    function updatePantryChoices() {
+        for (const select of lines.querySelectorAll('[data-field="pantry-item"]')) {
+            const selectedId = select.value;
+            select.replaceChildren(el("option", { value: "" }, "Choose pantry item (optional)"),
+                ...pantryIngredients.map((item) => el("option", { value: item.id }, pantryChoice(item))));
+            if (pantryIngredients.some((item) => item.id === selectedId)) select.value = selectedId;
+        }
+    }
 
     function addLine(item = { name: "", quantity: 1, unit: "" }) {
+        const foodName = el("input", { "data-field": "name", placeholder: "Search or enter ingredient", "aria-label": "Ingredient name", autocomplete: "off" });
+        const foodResults = el("div", { class: "autocomplete-results", role: "listbox", hidden: true });
+        const foodStatus = el("p", { class: "muted", "aria-live": "polite" });
+        const foodSearch = el("div", { class: "meal-food-search" }, foodName, foodResults, foodStatus);
         const row = el("div", { class: "meal-line" },
-            el("input", { "data-field": "name", placeholder: "Ingredient", "aria-label": "Ingredient name" }),
+            el("select", {
+                "data-field": "pantry-item",
+                "aria-label": "Select an existing pantry item (optional)",
+                onchange: (event) => {
+                    const pantryItem = pantryIngredients.find((ingredient) => ingredient.id === event.target.value);
+                    if (!pantryItem) return;
+                    row.querySelector('[data-field="name"]').value = pantryItem.name;
+                    row.querySelector('[data-field="unit"]').value = pantryItem.unit;
+                },
+            }, el("option", { value: "" }, "Choose pantry item (optional)")),
+            foodSearch,
             el("input", { "data-field": "quantity", type: "number", min: "0", step: "any", "aria-label": "Quantity" }),
             el("input", { "data-field": "unit", placeholder: "unit", "aria-label": "Unit" }),
             el("button", { type: "button", class: "small danger", onclick: () => row.remove() }, "✕"),
@@ -19,6 +47,14 @@
         row.querySelector('[data-field="quantity"]').value = item.quantity;
         row.querySelector('[data-field="unit"]').value = item.unit;
         lines.append(row);
+        setupFoodSearch({
+            input: foodName,
+            results: foodResults,
+            status: foodStatus,
+            loadDetails: false,
+            onSelect: (_food, query) => { foodName.value = query; },
+        });
+        updatePantryChoices();
     }
 
     function readForm() {
@@ -96,6 +132,11 @@
         empty.textContent = query ? "No meals match your search." : "No saved meals yet.";
     }
 
+    async function refreshPantryChoices() {
+        pantryIngredients = await api("/api/ingredients");
+        updatePantryChoices();
+    }
+
     async function run(action, changesMeals = false) {
         errorBox.textContent = "";
         try {
@@ -129,8 +170,12 @@
     });
 
     // Pantry changes affect what each meal still needs, so re-render when ingredients change.
-    document.addEventListener("ingredients-changed", () => run(() => Promise.resolve()));
+    document.addEventListener("ingredients-changed", () => {
+        refreshPantryChoices().catch((err) => { errorBox.textContent = err.message; });
+        run(() => Promise.resolve());
+    });
 
     resetForm();
+    refreshPantryChoices().catch((err) => { errorBox.textContent = err.message; });
     refresh().catch((err) => { errorBox.textContent = err.message; });
 })();

@@ -99,13 +99,14 @@ class WeeklyMealPlanServiceTest {
     }
 
     @Test
-    void doesNotConvertDifferentUnitsOrCountZeroStock() {
+    void matchesByIngredientNameRegardlessOfUnitAndIgnoresZeroStock() {
         stock("Rice", 100, "g", null);
         stock("Rice", 0, "cup", START);
         meal("Rice bowl", "rice", 1, "cup");
         WeeklyMealPlan plan = planner.generate(START, PlanningStrategy.PANTRY_FIRST);
-        assertEquals(0, plan.shoppingList().getFirst().fromPantry());
-        assertEquals(7, plan.shoppingList().getFirst().toBuy());
+        assertEquals(List.of(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0), plan.days().stream()
+                .map(d -> d.ingredients().getFirst().fromPantry()).toList());
+        assertTrue(plan.shoppingList().isEmpty());
     }
 
     @Test

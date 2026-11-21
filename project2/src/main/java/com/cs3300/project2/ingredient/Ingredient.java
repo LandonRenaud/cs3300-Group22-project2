@@ -52,7 +52,8 @@ public record Ingredient(
 
     private static String family(String unit) {
         return switch (normalize(unit)) {
-            case "g", "gram", "grams", "kg", "kilogram", "kilograms", "mg", "milligram", "milligrams" -> "mass";
+            case "g", "gram", "grams", "kg", "kilogram", "kilograms", "mg", "milligram", "milligrams",
+                    "oz", "ounce", "ounces", "lb", "lbs", "pound", "pounds" -> "mass";
             case "ml", "milliliter", "milliliters", "l", "liter", "liters" -> "volume";
             case "item", "items", "each", "piece", "pieces" -> "count";
             case "serving", "servings" -> "serving";
@@ -65,6 +66,8 @@ public record Ingredient(
             case "g", "gram", "grams", "ml", "milliliter", "milliliters", "item", "items", "each", "piece", "pieces", "serving", "servings" -> amount;
             case "kg", "kilogram", "kilograms", "l", "liter", "liters" -> amount * 1000;
             case "mg", "milligram", "milligrams" -> amount / 1000;
+            case "oz", "ounce", "ounces" -> amount * 28.349523125;
+            case "lb", "lbs", "pound", "pounds" -> amount * 453.59237;
             default -> null;
         };
     }

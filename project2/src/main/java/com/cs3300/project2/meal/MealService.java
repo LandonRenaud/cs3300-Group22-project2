@@ -64,21 +64,17 @@ public class MealService {
     public List<ShoppingListItem> shoppingList(String id) {
         Meal meal = findById(id);
         Map<String, Double> pantry = ingredients.findAll().stream()
-                .collect(Collectors.groupingBy(MealService::pantryKey, Collectors.summingDouble(Ingredient::quantity)));
+                .collect(Collectors.groupingBy(ingredient -> MealFactory.ingredientNameKey(ingredient.name()),
+                        Collectors.summingDouble(Ingredient::quantity)));
 
         return meal.ingredients().stream()
                 .map(line -> {
-                    double onHand = pantry.getOrDefault(MealFactory.key(line), 0.0);
+                    double onHand = pantry.getOrDefault(MealFactory.ingredientNameKey(line.name()), 0.0);
                     return new ShoppingListItem(line.name(), line.unit(), line.quantity(), onHand,
                             Math.max(0, line.quantity() - onHand));
                 })
                 .toList();
     }
-
-    private static String pantryKey(Ingredient ingredient) {
-        return MealFactory.key(new MealIngredient(ingredient.name(), ingredient.quantity(), ingredient.unit()));
-    }
-
     private static boolean contains(String text, String lowerNeedle) {
         return text.toLowerCase(Locale.ROOT).contains(lowerNeedle);
     }
