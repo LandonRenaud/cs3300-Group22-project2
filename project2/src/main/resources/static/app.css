@@ -121,7 +121,7 @@ td.controls { display: flex; gap: 6px; justify-content: flex-end; }
 .autocomplete-option { display: block; width: 100%; border: 0; border-radius: 0; background: transparent; color: var(--text); text-align: left; padding: 10px 12px; }
 .autocomplete-option + .autocomplete-option { border-top: 1px solid var(--border); }
 .autocomplete-option:hover, .autocomplete-option:focus { background: var(--bg); }
-.nutrition-preview { margin: 12px 0; padding: 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); }
+.nutrition-preview { max-height: 250px; overflow-y: auto; margin: 12px 0; padding: 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); }
 .nutrition-customize { margin-top: 14px; }
 .nutrition-customize summary { cursor: pointer; color: var(--accent); font-weight: 600; }
 .nutrition-facts { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(100px, 1fr); gap: 4px 16px; margin: 8px 0; }
