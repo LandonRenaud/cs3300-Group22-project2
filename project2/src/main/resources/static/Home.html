@@ -133,7 +133,7 @@
 
     <section id="weekly-plan" class="workspace-section planner-section" hidden>
         <div class="section-heading"><div><p class="eyebrow">PLAN AHEAD</p><h2>Weekly plan</h2></div></div>
-        <p class="muted">Plan one saved recipe per day. Recipes may repeat. This preview does not change your inventory.</p>
+        <p class="muted">Plan one saved recipe per day. Recipes may repeat. Generating or saving a plan does not change your inventory.</p>
         <form id="weekly-plan-form" class="card">
             <div class="row">
                 <label>Week starts <input name="startDate" type="date" min="0001-01-01" max="9999-12-25" required></label>
@@ -149,12 +149,24 @@
             <p id="weekly-plan-error" class="error" role="alert"></p>
         </form>
         <div id="weekly-plan-results" hidden>
+            <div class="actions"><button id="weekly-plan-save" type="button" disabled>Save this week</button></div>
+            <p id="weekly-plan-snapshot-note" class="muted"></p>
             <div id="weekly-plan-days"></div>
             <div class="card">
                 <h3>Shopping list for the week</h3>
                 <ul id="weekly-plan-shopping"></ul>
             </div>
         </div>
+        <section class="card" aria-labelledby="saved-weekly-plans-heading">
+            <div class="section-heading">
+                <h3 id="saved-weekly-plans-heading">Saved weekly plans</h3>
+                <button id="saved-weekly-plans-refresh" type="button" class="small secondary">Refresh saved plans</button>
+            </div>
+            <p class="muted">Keep a week and its shopping list to open later. Each save creates a separate snapshot using your latest recipes and pantry.</p>
+            <p id="saved-weekly-plans-status" class="muted" role="status"></p>
+            <p id="saved-weekly-plans-error" class="error" role="alert"></p>
+            <ul id="saved-weekly-plans-list" class="saved-weekly-plans-list"></ul>
+        </section>
     </section>
     </section>
 </main>
