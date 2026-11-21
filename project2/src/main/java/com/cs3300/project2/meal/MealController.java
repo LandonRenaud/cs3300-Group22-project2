@@ -1,7 +1,9 @@
 package com.cs3300.project2.meal;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,8 +37,9 @@ public class MealController {
     }
 
     @GetMapping("/{id}/shopping-list")
-    public List<ShoppingListItem> shoppingList(@PathVariable String id) {
-        return service.shoppingList(id);
+    public List<ShoppingListItem> shoppingList(@PathVariable String id,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate onDate) {
+        return service.shoppingList(id, onDate);
     }
 
     @PostMapping

@@ -7,7 +7,15 @@
     const errorBox = document.getElementById("meal-error");
     const submit = document.getElementById("meal-submit");
     const cancel = document.getElementById("meal-cancel");
+    const shoppingDate = document.getElementById("meal-shopping-date");
+    const shoppingStatus = document.getElementById("meal-shopping-status");
+    const shoppingError = document.getElementById("meal-shopping-error");
+    const today = new Date();
+    shoppingDate.value = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, "0"),
+        String(today.getDate()).padStart(2, "0")].join("-");
     let pantryIngredients = [];
+    let refreshVersion = 0;
+    const shoppingAmount = (value) => value.toLocaleString("en-US", { maximumSignificantDigits: 6 });
 
     function pantryChoice(item) {
         return `${item.name} — ${formatNumber(item.quantity)} ${item.unit}`;
@@ -91,18 +99,18 @@
     }
 
     function ingredientItem(line) {
-        const text = `${formatNumber(line.needed)} ${line.unit} ${line.name}`;
+        const text = `${shoppingAmount(line.needed)} ${line.unit} ${line.name}`;
         if (line.toBuy === 0) {
             return el("li", { class: "have" }, `${text} — have it`);
         }
         const note = line.onHand > 0
-            ? `buy ${formatNumber(line.toBuy)} more (have ${formatNumber(line.onHand)})`
+            ? `buy ${shoppingAmount(line.toBuy)} more (have ${shoppingAmount(line.onHand)})`
             : "need to buy";
         return el("li", { class: "need" }, `${text} — ${note}`);
     }
 
-    async function renderMeal(meal) {
-        const shopping = await api(`/api/meals/${meal.id}/shopping-list`);
+    async function renderMeal(meal, onDate) {
+        const shopping = await api(`/api/meals/${meal.id}/shopping-list?${new URLSearchParams({ onDate })}`);
         const missing = shopping.filter((line) => line.toBuy > 0).length;
         return el("div", { class: "card meal-card" },
             el("div", { class: "header" },
@@ -125,11 +133,32 @@
     }
 
     async function refresh() {
+        const version = ++refreshVersion;
         const query = search.value.trim();
-        const meals = await api(`/api/meals${query ? `?q=${encodeURIComponent(query)}` : ""}`);
-        list.replaceChildren(...await Promise.all(meals.map(renderMeal)));
-        empty.hidden = meals.length > 0;
-        empty.textContent = query ? "No meals match your search." : "No saved meals yet.";
+        const onDate = shoppingDate.value;
+        list.replaceChildren();
+        empty.hidden = true;
+        shoppingError.textContent = "";
+        if (!onDate || !shoppingDate.checkValidity()) {
+            shoppingStatus.textContent = "Choose a valid cooking date to check your pantry.";
+            return;
+        }
+        shoppingStatus.textContent = "Checking pantry availability...";
+        try {
+            const meals = await api(`/api/meals${query ? `?q=${encodeURIComponent(query)}` : ""}`);
+            if (version !== refreshVersion) return;
+            const cards = await Promise.all(meals.map((meal) => renderMeal(meal, onDate)));
+            if (version !== refreshVersion) return;
+            list.replaceChildren(...cards);
+            empty.hidden = meals.length > 0;
+            empty.textContent = query ? "No meals match your search." : "No saved meals yet.";
+            shoppingStatus.textContent = meals.length ? `Pantry availability for ${onDate}. Inventory is unchanged.` : "";
+        } catch (err) {
+            if (version === refreshVersion) {
+                shoppingStatus.textContent = "";
+                shoppingError.textContent = err.message;
+            }
+        }
     }
 
     async function refreshPantryChoices() {
@@ -166,7 +195,16 @@
     let searchTimer;
     search.addEventListener("input", () => {
         clearTimeout(searchTimer);
+        refreshVersion++;
+        list.replaceChildren();
+        empty.hidden = true;
+        shoppingError.textContent = "";
+        shoppingStatus.textContent = "Checking pantry availability...";
         searchTimer = setTimeout(() => run(() => Promise.resolve()), 200);
+    });
+    shoppingDate.addEventListener("input", () => {
+        clearTimeout(searchTimer);
+        refresh();
     });
 
     // Pantry changes affect what each meal still needs, so re-render when ingredients change.

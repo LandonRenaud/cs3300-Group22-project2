@@ -120,7 +120,13 @@
             </div>
         </form>
 
-        <label class="spaced">Search meals <input id="meal-search" type="search" placeholder="Meal or ingredient name"></label>
+        <div class="row spaced">
+            <label>Search meals <input id="meal-search" type="search" placeholder="Meal or ingredient name"></label>
+            <label>Cooking date <input id="meal-shopping-date" type="date" min="0001-01-01" max="9999-12-31" required aria-describedby="meal-shopping-help"></label>
+        </div>
+        <p id="meal-shopping-help" class="muted">Shopping needs use stock that has not expired by the cooking date. Items expiring that day and items without a date are included. Each meal is checked separately.</p>
+        <p id="meal-shopping-status" class="muted" role="status"></p>
+        <p id="meal-shopping-error" class="error" role="alert"></p>
         <div id="meal-list"></div>
         <p id="meal-empty" class="muted">No saved meals yet.</p>
     </section>

@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.Clock;
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +32,8 @@ class WeeklyMealPlanServiceTest {
     @BeforeEach
     void setUp() {
         pantry = new IngredientService(new InMemoryIngredientRepository(), new IngredientFactory());
-        meals = new MealService(new InMemoryMealRepository(), new MealFactory(), pantry);
+        meals = new MealService(new InMemoryMealRepository(), new MealFactory(), pantry,
+                Clock.fixed(START.atStartOfDay().toInstant(ZoneOffset.UTC), ZoneOffset.UTC));
         planner = new WeeklyMealPlanService(meals, pantry, new MealPlanFactory());
     }
 
