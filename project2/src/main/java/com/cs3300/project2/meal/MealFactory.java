@@ -70,6 +70,11 @@ public class MealFactory {
     }
 
     static String key(MealIngredient line) {
-        return line.name().toLowerCase(Locale.ROOT) + "|" + line.unit();
+        return ingredientNameKey(line.name()) + "|" + line.unit();
+    }
+
+    /** Name identity used to compare recipe ingredients with pantry entries, regardless of unit. */
+    public static String ingredientNameKey(String name) {
+        return normalizeName(name).toLowerCase(Locale.ROOT);
     }
 }

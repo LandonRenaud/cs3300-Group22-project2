@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
@@ -14,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.cs3300.project2.ingredient.Ingredient;
 import com.cs3300.project2.ingredient.IngredientService;
 import com.cs3300.project2.meal.Meal;
+import com.cs3300.project2.meal.MealFactory;
 import com.cs3300.project2.meal.MealIngredient;
 import com.cs3300.project2.meal.MealService;
 import com.cs3300.project2.mealplan.MealSelectionStrategy.Candidate;
@@ -75,7 +75,7 @@ public class WeeklyMealPlanService {
             if (line.quantity() <= 0) continue;
             BigDecimal required = BigDecimal.valueOf(line.quantity());
             BigDecimal missing = required;
-            Key key = new Key(line.name(), line.unit());
+            Key key = new Key(line.name());
             for (Stock stock : pantry) {
                 if (missing.signum() == 0) break;
                 LocalDate expiry = stock.ingredient.expirationDate();
@@ -96,9 +96,9 @@ public class WeeklyMealPlanService {
     private record Allocation(List<IngredientNeed> needs, LocalDate earliestExpiry, double coverage) {
     }
 
-    private record Key(String name, String unit) {
+    private record Key(String name) {
         private Key {
-            name = name.toLowerCase(Locale.ROOT);
+            name = MealFactory.ingredientNameKey(name);
         }
     }
 
@@ -109,7 +109,7 @@ public class WeeklyMealPlanService {
 
         private Stock(Ingredient ingredient) {
             this.ingredient = ingredient;
-            key = new Key(ingredient.name(), ingredient.unit());
+            key = new Key(ingredient.name());
             remaining = BigDecimal.valueOf(ingredient.quantity());
         }
 

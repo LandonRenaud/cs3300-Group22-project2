@@ -105,9 +105,11 @@
         }
     }
 
-    function selectFood(food) {
+    function selectFood(food, ingredientName) {
         selectedNutrition = { nutritionBasis: food.nutritionBasis, nutritionSource: food.nutritionSource };
-        form.elements.name.value = food.description;
+        // Keep the user's generic search term for pantry/meal matching; retain the
+        // detailed USDA description only in nutritionSource for provenance.
+        form.elements.name.value = ingredientName;
         const nutrition = food.nutritionPerUnit;
         form.elements.calories.value = nutrition.calories ?? "";
         form.elements.proteinGrams.value = nutrition.proteinGrams ?? "";

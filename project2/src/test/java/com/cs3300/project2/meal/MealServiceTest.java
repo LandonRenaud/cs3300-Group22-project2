@@ -69,14 +69,14 @@ class MealServiceTest {
         pantry.add(new IngredientRequest("rice", 5.0, "Cup", null, null));      // enough, case-insensitive
         pantry.add(new IngredientRequest("Eggs", 1.0, null, null, null));       // partial
         pantry.add(new IngredientRequest("Eggs", 1.0, "item", null, null));     // separate batch, summed
-        pantry.add(new IngredientRequest("Soy Sauce", 1.0, "cup", null, null)); // wrong unit, doesn't count
+        pantry.add(new IngredientRequest("Soy Sauce", 1.0, "cup", null, null)); // same ingredient counts despite unit
 
         List<ShoppingListItem> list = service.shoppingList(meal.id());
 
         assertEquals(List.of(
                 new ShoppingListItem("Rice", "cup", 2.0, 5.0, 0.0),
                 new ShoppingListItem("Eggs", "item", 3.0, 2.0, 1.0),
-                new ShoppingListItem("Soy Sauce", "tbsp", 2.0, 0.0, 2.0)), list);
+                new ShoppingListItem("Soy Sauce", "tbsp", 2.0, 1.0, 1.0)), list);
     }
 
     @Test
