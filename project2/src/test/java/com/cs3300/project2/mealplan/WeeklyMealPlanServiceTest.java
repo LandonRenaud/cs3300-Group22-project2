@@ -61,6 +61,20 @@ class WeeklyMealPlanServiceTest {
     }
 
     @Test
+    void acceptsLatestStartDateThatFitsSevenDays() {
+        LocalDate latestStart = LocalDate.of(9999, 12, 25);
+        meal("Rice bowl", "Rice", 1, "cup");
+
+        WeeklyMealPlan plan = planner.generate(latestStart, PlanningStrategy.EXPIRY_FIRST);
+
+        assertEquals(7, plan.days().size());
+        assertEquals(latestStart, plan.days().getFirst().date());
+        assertEquals(LocalDate.of(9999, 12, 31), plan.days().getLast().date());
+        assertThrows(IllegalArgumentException.class,
+                () -> planner.generate(latestStart.plusDays(1), PlanningStrategy.EXPIRY_FIRST));
+    }
+
+    @Test
     void allocatesInventoryOnlyOnceAndLeavesSavedDataUnchanged() {
         Ingredient eggs = stock("EGGS", 3, "item", null);
         meal("Omelet", "Eggs", 2, "item");
