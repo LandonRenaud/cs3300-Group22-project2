@@ -24,8 +24,9 @@ public class FirebaseConfiguration {
         return new FirebaseSettings(webApiKey, databaseUrl.replaceAll("/+$", ""));
     }
 
+    /** Exposes the {@link FirebaseClient} singleton's transport to Spring-managed Firebase services. */
     @Bean
     HttpClient firebaseHttpClient() {
-        return HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
+        return FirebaseClient.getInstance().http();
     }
 }
