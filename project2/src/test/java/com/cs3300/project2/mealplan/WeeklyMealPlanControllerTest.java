@@ -56,6 +56,24 @@ class WeeklyMealPlanControllerTest {
     }
 
     @Test
+    void usesStockOnItsExpirationDateButExcludesItFromLaterDays() throws Exception {
+        mvc.perform(post("/api/ingredients").contentType(MediaType.APPLICATION_JSON).content("""
+                {"name":"Milk","quantity":7,"unit":"cup","expirationDate":"2026-11-15"}
+                """)).andExpect(status().isCreated());
+        mvc.perform(post("/api/meals").contentType(MediaType.APPLICATION_JSON).content("""
+                {"name":"Porridge","ingredients":[{"name":"Milk","quantity":1,"unit":"cup"}]}
+                """)).andExpect(status().isCreated());
+
+        mvc.perform(get("/api/meal-plans/weekly").param("startDate", "2026-11-15"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.days", hasSize(7)))
+                .andExpect(jsonPath("$.days[0].ingredients[0].fromPantry").value(1.0))
+                .andExpect(jsonPath("$.days[1].ingredients[0].fromPantry").value(0.0))
+                .andExpect(jsonPath("$.shoppingList", hasSize(1)))
+                .andExpect(jsonPath("$.shoppingList[0].toBuy").value(6.0));
+    }
+
+    @Test
     void rejectsMissingMalformedOrOutOfRangeStartDates() throws Exception {
         mvc.perform(get("/api/meal-plans/weekly")).andExpect(status().isBadRequest());
         for (String date : new String[]{"tomorrow", "2026-02-30", "9999-12-31", "0000-01-01"}) {
